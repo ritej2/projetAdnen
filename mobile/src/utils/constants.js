@@ -66,3 +66,12 @@ export const APPLICATION_STATUS_CONFIG = {
 };
 
 export const CONTRACT_TYPES = ['CDI', 'CDD', 'Stage', 'Alternance', 'Freelance', 'Temps partiel'];
+
+export const JOB_CATEGORIES = [
+  'Ingénierie & Tech',
+  'Data & IA',
+  'Design & Produit',
+  'Cybersécurité',
+  'Finance & Fintech',
+  'Gestion de Projet',
+];

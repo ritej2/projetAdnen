@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Alert,
+  Image,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../utils/constants';
@@ -17,6 +18,7 @@ import testService from '../../services/testService';
 import CustomButton from '../../components/CustomButton';
 import { useAuth } from '../../context/AuthContext';
 import { SEED_JOBS } from '../../utils/seedData';
+import { getCompanyLogoAsset } from '../../utils/assets';
 
 export const JobDetailScreen = ({ route, navigation }) => {
   const { user, isCandidate } = useAuth();
@@ -101,9 +103,11 @@ export const JobDetailScreen = ({ route, navigation }) => {
         {/* En-tête de l'offre */}
         <View style={styles.headerCard}>
           <View style={styles.logoBadge}>
-            <Text style={styles.logoBadgeText}>
-              {(job.nomEntreprise || 'E').substring(0, 2).toUpperCase()}
-            </Text>
+            <Image
+              source={getCompanyLogoAsset(job?.entrepriseId || job?.id)}
+              style={styles.logoBadgeImage}
+              resizeMode="contain"
+            />
           </View>
           <Text style={styles.title}>{job.titre}</Text>
           <Text style={styles.companyName}>{job.nomEntreprise || 'Entreprise'}</Text>
@@ -256,15 +260,17 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 16,
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: '#F8FAFC',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    overflow: 'hidden',
   },
-  logoBadgeText: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: COLORS.primary,
+  logoBadgeImage: {
+    width: 52,
+    height: 52,
   },
   title: {
     fontSize: 20,

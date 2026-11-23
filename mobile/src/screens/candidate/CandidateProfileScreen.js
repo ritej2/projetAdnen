@@ -6,12 +6,14 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Image,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../utils/constants';
 import { useAuth } from '../../context/AuthContext';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
+import { getCandidateAvatarAsset } from '../../utils/assets';
 
 export const CandidateProfileScreen = () => {
   const { user, candidat, refreshProfile, logout } = useAuth();
@@ -51,9 +53,11 @@ export const CandidateProfileScreen = () => {
       {/* Carte identité */}
       <View style={styles.profileHeader}>
         <View style={styles.avatarCircle}>
-          <Text style={styles.avatarText}>
-            {(nom || 'C').substring(0, 2).toUpperCase()}
-          </Text>
+          <Image
+            source={getCandidateAvatarAsset(user?.id || 1)}
+            style={styles.avatarImage}
+            resizeMode="cover"
+          />
         </View>
         <Text style={styles.userName}>{nom}</Text>
         <Text style={styles.userTitle}>{titreProfil || 'Candidat JobFlow'}</Text>
@@ -147,15 +151,18 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: '#F8FAFC',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
+    borderWidth: 2,
+    borderColor: COLORS.primary,
+    overflow: 'hidden',
   },
-  avatarText: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: COLORS.primary,
+  avatarImage: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
   },
   userName: {
     fontSize: 20,

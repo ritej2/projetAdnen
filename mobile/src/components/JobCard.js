@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../utils/constants';
 import { formatSalary, formatDate } from '../utils/formatters';
+import { getCompanyLogoAsset } from '../utils/assets';
 
 export const JobCard = ({
   job,
@@ -12,7 +13,7 @@ export const JobCard = ({
   hasApplied = false,
   onApply,
 }) => {
-  const initial = (job?.nomEntreprise || 'E').substring(0, 2).toUpperCase();
+  const companyLogo = getCompanyLogoAsset(job?.entrepriseId || job?.id);
 
   return (
     <TouchableOpacity
@@ -24,7 +25,7 @@ export const JobCard = ({
       <View style={styles.header}>
         <View style={styles.companyInfo}>
           <View style={styles.logoPlaceholder}>
-            <Text style={styles.logoText}>{initial}</Text>
+            <Image source={companyLogo} style={styles.logoImage} resizeMode="contain" />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.companyName} numberOfLines={1}>
@@ -140,13 +141,20 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   logoPlaceholder: {
-    width: 46,
-    height: 46,
+    width: 48,
+    height: 48,
     borderRadius: 12,
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: '#F8FAFC',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    overflow: 'hidden',
+  },
+  logoImage: {
+    width: 40,
+    height: 40,
   },
   logoText: {
     fontSize: 16,

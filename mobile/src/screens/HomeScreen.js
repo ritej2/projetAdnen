@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   FlatList,
   Alert,
+  Image,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../utils/constants';
@@ -19,6 +20,7 @@ import applicationService from '../services/applicationService';
 import api from '../services/api';
 import JobCard from '../components/JobCard';
 import { useAuth } from '../context/AuthContext';
+import { BANNER_IMAGE, getCompanyLogoAsset } from '../utils/assets';
 
 export const HomeScreen = ({ navigation }) => {
   const { user, isCandidate } = useAuth();
@@ -181,6 +183,9 @@ export const HomeScreen = ({ navigation }) => {
             <Text style={styles.searchBtnText}>Rechercher</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Illustration bannière (même image que le web) */}
+        <Image source={BANNER_IMAGE} style={styles.heroBannerImage} resizeMode="cover" />
       </View>
 
       {/* Cartes KPI Chiffres Clés */}
@@ -328,9 +333,11 @@ export const HomeScreen = ({ navigation }) => {
                 onPress={() => navigation.navigate('CompaniesTab')}
               >
                 <View style={styles.companyLogoPlaceholder}>
-                  <Text style={styles.companyLogoLetter}>
-                    {(item?.nomEntreprise || 'E').substring(0, 2).toUpperCase()}
-                  </Text>
+                  <Image
+                    source={getCompanyLogoAsset(item?.id)}
+                    style={styles.companyLogoImage}
+                    resizeMode="contain"
+                  />
                 </View>
                 <Text style={styles.companyNameText} numberOfLines={1}>
                   {item?.nomEntreprise || 'Entreprise Partenaire'}
@@ -476,6 +483,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
   },
+  heroBannerImage: {
+    width: '100%',
+    height: 180,
+    borderRadius: 14,
+    marginTop: 16,
+  },
   kpiContainer: {
     flexDirection: 'row',
     gap: 10,
@@ -575,15 +588,17 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 12,
-    backgroundColor: '#ede9fe',
+    backgroundColor: '#F8FAFC',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    overflow: 'hidden',
   },
-  companyLogoLetter: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#7c3aed',
+  companyLogoImage: {
+    width: 40,
+    height: 40,
   },
   companyNameText: {
     fontSize: 13,

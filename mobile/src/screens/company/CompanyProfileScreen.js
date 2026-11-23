@@ -6,12 +6,14 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Image,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../utils/constants';
 import { useAuth } from '../../context/AuthContext';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
+import { getCompanyLogoAsset } from '../../utils/assets';
 
 export const CompanyProfileScreen = () => {
   const { user, entreprise, refreshProfile, logout } = useAuth();
@@ -52,9 +54,11 @@ export const CompanyProfileScreen = () => {
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.headerCard}>
         <View style={styles.logoBadge}>
-          <Text style={styles.logoText}>
-            {(nomEntreprise || 'E').substring(0, 2).toUpperCase()}
-          </Text>
+          <Image
+            source={getCompanyLogoAsset(entreprise?.id || user?.id || 1)}
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
         </View>
         <Text style={styles.companyName}>{nomEntreprise || 'Mon Entreprise'}</Text>
         <Text style={styles.sector}>{secteur || 'Technologie & Recrutement'}</Text>
@@ -152,15 +156,17 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 18,
-    backgroundColor: '#ede9fe',
+    backgroundColor: '#F8FAFC',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    overflow: 'hidden',
   },
-  logoText: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#7c3aed',
+  logoImage: {
+    width: 58,
+    height: 58,
   },
   companyName: {
     fontSize: 20,

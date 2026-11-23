@@ -8,6 +8,7 @@ import {
   Alert,
   TextInput,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../utils/constants';
@@ -16,6 +17,7 @@ import applicationService from '../services/applicationService';
 import interviewService from '../services/interviewService';
 import jobService from '../services/jobService';
 import { setCustomApiHost, api } from '../services/api';
+import { getCandidateAvatarAsset, getCompanyLogoAsset } from '../utils/assets';
 
 export const AccountScreen = ({ navigation }) => {
   const { user, isCandidate, isCompany, logout, loginDemo, isLoading } = useAuth();
@@ -181,8 +183,12 @@ export const AccountScreen = ({ navigation }) => {
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         {/* En-tête profil */}
         <View style={styles.userHeaderCard}>
-          <View style={styles.avatarBox}>
-            <Text style={styles.avatarText}>{initial}</Text>
+          <View style={[styles.avatarBox, { overflow: 'hidden' }]}>
+            <Image
+              source={getCandidateAvatarAsset(user?.id || 1)}
+              style={styles.avatarImage}
+              resizeMode="cover"
+            />
           </View>
           <View style={styles.userHeaderInfo}>
             <Text style={styles.userName}>{user.nom || 'Candidat'}</Text>
@@ -257,8 +263,12 @@ export const AccountScreen = ({ navigation }) => {
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       {/* En-tête profil Entreprise */}
       <View style={styles.userHeaderCard}>
-        <View style={[styles.avatarBox, { backgroundColor: '#FEF3C7' }]}>
-          <Text style={[styles.avatarText, { color: '#D97706' }]}>{companyInitial}</Text>
+        <View style={[styles.avatarBox, { overflow: 'hidden', backgroundColor: '#F8FAFC' }]}>
+          <Image
+            source={getCompanyLogoAsset(user?.entrepriseId || user?.id || 1)}
+            style={styles.avatarCompanyImage}
+            resizeMode="contain"
+          />
         </View>
         <View style={styles.userHeaderInfo}>
           <Text style={styles.userName}>{user.nom || 'Entreprise'}</Text>
@@ -542,6 +552,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 14,
+  },
+  avatarImage: {
+    width: 52,
+    height: 52,
+    borderRadius: 12,
+  },
+  avatarCompanyImage: {
+    width: 44,
+    height: 44,
   },
   avatarText: {
     fontSize: 22,

@@ -9,11 +9,13 @@ import {
   RefreshControl,
   ActivityIndicator,
   Linking,
+  Image,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../utils/constants';
 import api from '../services/api';
 import { SEED_COMPANIES } from '../utils/seedData';
+import { getCompanyLogoAsset } from '../utils/assets';
 
 export const CompaniesScreen = ({ navigation }) => {
   const [companies, setCompanies] = useState(SEED_COMPANIES);
@@ -62,13 +64,15 @@ export const CompaniesScreen = ({ navigation }) => {
   };
 
   const renderCompanyCard = ({ item }) => {
-    const initial = (item.nomEntreprise || 'E').charAt(0).toUpperCase();
-
     return (
       <View style={styles.card}>
         <View style={styles.cardHeader}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{initial}</Text>
+            <Image
+              source={getCompanyLogoAsset(item?.id)}
+              style={styles.avatarImage}
+              resizeMode="contain"
+            />
           </View>
           <View style={styles.headerInfo}>
             <Text style={styles.companyName} numberOfLines={1}>
@@ -268,15 +272,17 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 10,
-    backgroundColor: '#E8F0FE',
+    backgroundColor: '#F8FAFC',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    overflow: 'hidden',
   },
-  avatarText: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: COLORS.primary,
+  avatarImage: {
+    width: 40,
+    height: 40,
   },
   headerInfo: {
     flex: 1,

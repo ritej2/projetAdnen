@@ -11,7 +11,7 @@ import {
   Alert,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, CONTRACT_TYPES } from '../../utils/constants';
+import { COLORS, CONTRACT_TYPES, JOB_CATEGORIES } from '../../utils/constants';
 import { SEED_JOBS } from '../../utils/seedData';
 import JobCard from '../../components/JobCard';
 import EmptyState from '../../components/EmptyState';
@@ -188,7 +188,7 @@ export const JobListScreen = ({ route, navigation }) => {
           horizontal
           showsHorizontalScrollIndicator={false}
           data={['Tous', ...CONTRACT_TYPES]}
-          keyExtractor={(item) => item}
+          keyExtractor={(item, index) => (item ? String(item) : `contract-${index}`)}
           contentContainerStyle={styles.filterList}
           renderItem={({ item }) => {
             const isSelected = (item === 'Tous' && !selectedContract) || selectedContract === item;
@@ -198,6 +198,38 @@ export const JobListScreen = ({ route, navigation }) => {
                 style={[styles.filterChip, isSelected && styles.activeFilterChip]}
               >
                 <Text style={[styles.filterText, isSelected && styles.activeFilterText]}>
+                  {item}
+                </Text>
+              </TouchableOpacity>
+            );
+          }}
+        />
+
+        {/* Filtres de catégories horizontaux */}
+        <FlatList
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          data={['Toutes catégories', ...JOB_CATEGORIES]}
+          keyExtractor={(item, index) => (item ? String(item) : `cat-${index}`)}
+          contentContainerStyle={[styles.filterList, { marginTop: 6 }]}
+          renderItem={({ item }) => {
+            const isSelected =
+              (item === 'Toutes catégories' && !selectedCategory) || selectedCategory === item;
+            return (
+              <TouchableOpacity
+                onPress={() => setSelectedCategory(item === 'Toutes catégories' ? '' : item)}
+                style={[
+                  styles.filterChip,
+                  { backgroundColor: '#F8FAFC' },
+                  isSelected && { backgroundColor: '#EDE9FE', borderColor: '#7C3AED' },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.filterText,
+                    isSelected && { color: '#7C3AED', fontWeight: '700' },
+                  ]}
+                >
                   {item}
                 </Text>
               </TouchableOpacity>
