@@ -9,20 +9,24 @@ import {
   RefreshControl,
   ActivityIndicator,
   FlatList,
+  Alert,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../utils/constants';
+import { SEED_JOBS, SEED_COMPANIES } from '../utils/seedData';
 import jobService from '../services/jobService';
+import applicationService from '../services/applicationService';
 import api from '../services/api';
 import JobCard from '../components/JobCard';
 import { useAuth } from '../context/AuthContext';
 
 export const HomeScreen = ({ navigation }) => {
-  const { user, isCandidate, isCompany } = useAuth();
+  const { user, isCandidate } = useAuth();
   const [keyword, setKeyword] = useState('');
-  const [featuredJobs, setFeaturedJobs] = useState([]);
-  const [companies, setCompanies] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [featuredJobs, setFeaturedJobs] = useState(SEED_JOBS);
+  const [companies, setCompanies] = useState(SEED_COMPANIES);
+  const [appliedOfferIds, setAppliedOfferIds] = useState(new Set());
+  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [stats, setStats] = useState({
     activeOffers: 6,
@@ -38,9 +42,8 @@ export const HomeScreen = ({ navigation }) => {
         api.get('/api/stats/public'),
       ]);
 
-      if (jobsData.status === 'fulfilled') {
-        const content = jobsData.value?.content || [];
-        setFeaturedJobs(content);
+      if (jobsData.status === 'fulfilled' && jobsData.value?.content?.length > 0) {
+        setFeaturedJobs(jobsData.value.content);
         if (jobsData.value?.totalElements) {
           setStats((prev) => ({ ...prev, activeOffers: jobsData.value.totalElements }));
         }
@@ -53,8 +56,8 @@ export const HomeScreen = ({ navigation }) => {
           : Array.isArray(raw?.content)
           ? raw.content
           : [];
-        setCompanies(list.filter(Boolean));
         if (list.length > 0) {
+          setCompanies(list.filter(Boolean));
           setStats((prev) => ({ ...prev, totalCompanies: list.length }));
         }
       }
@@ -73,6 +76,42 @@ export const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  useEffect(() => {
+    if (user && isCandidate) {
+      applicationService
+        .getMyApplications()
+        .then((apps) => {
+          const ids = new Set((apps || []).map((a) => a.offreId));
+          setAppliedOfferIds(ids);
+        })
+        .catch(() => {});
+    } else {
+      setAppliedOfferIds(new Set());
+    }
+  }, [user, isCandidate]);
+
+  const handleApplyToJob = (job) => {
+    if (!user) {
+      Alert.alert(
+        'Connexion requise',
+        'Veuillez vous connecter en tant que candidat pour postuler à cette offre d’emploi.',
+        [
+          { text: 'Annuler', style: 'cancel' },
+          { text: 'Se connecter', onPress: () => navigation.navigate('Login') },
+        ]
+      );
+      return;
+    }
+    if (!isCandidate) {
+      Alert.alert(
+        'Accès Candidat Requis',
+        'Seuls les candidats peuvent postuler aux offres d’emploi. Votre profil actuel est un profil entreprise.'
+      );
+      return;
+    }
+    navigation.navigate('ApplyModal', { job });
+  };
 
   const categories = [
     { name: 'Ingénierie & Tech', icon: 'code-tags', sub: 'Java, Spring, React, DevOps' },
@@ -204,14 +243,58 @@ export const HomeScreen = ({ navigation }) => {
         {loading ? (
           <ActivityIndicator size="small" color={COLORS.primary} style={{ marginVertical: 20 }} />
         ) : (
-          featuredJobs.slice(0, 4).map((job) => (
+          featuredJobs.slice(0, 6).map((job, index) => (
             <JobCard
-              key={job.id}
+              key={job?.id ? `job-${job.id}` : `job-${index}`}
               job={job}
+              hasApplied={appliedOfferIds.has(job.id)}
               onPress={() => navigation.navigate('JobDetail', { jobId: job.id })}
+              onApply={() => handleApplyToJob(job)}
             />
           ))
         )}
+      </View>
+
+      {/* Comment ça marche - Superio 3 Étapes */}
+      <View style={styles.workSection}>
+        <Text style={styles.workSectionTitle}>Comment fonctionne JobFlow ?</Text>
+        <Text style={styles.workSectionSub}>Un parcours fluide pour propulser votre carrière</Text>
+
+        <View style={styles.workStepCard}>
+          <View style={[styles.workStepIconBox, { backgroundColor: '#E8F0FE' }]}>
+            <MaterialCommunityIcons name="account-plus-outline" size={24} color={COLORS.primary} />
+          </View>
+          <View style={styles.workStepContent}>
+            <Text style={styles.workStepName}>1. Créez votre profil & déposez votre CV</Text>
+            <Text style={styles.workStepDesc}>
+              Renseignez vos compétences, téléchargez votre CV et définissez vos critères.
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.workStepCard}>
+          <View style={[styles.workStepIconBox, { backgroundColor: '#ECFDF5' }]}>
+            <MaterialCommunityIcons name="send" size={22} color="#059669" />
+          </View>
+          <View style={styles.workStepContent}>
+            <Text style={styles.workStepName}>2. Postulez en 1 clic aux offres</Text>
+            <Text style={styles.workStepDesc}>
+              Parcourez les offres vérifiées et envoyez votre candidature instantanément.
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.workStepCard}>
+          <View style={[styles.workStepIconBox, { backgroundColor: '#FEF3C7' }]}>
+            <MaterialCommunityIcons name="calendar-check" size={22} color="#D97706" />
+          </View>
+          <View style={styles.workStepContent}>
+            <Text style={styles.workStepName}>3. Passez vos tests & entretiens</Text>
+            <Text style={styles.workStepDesc}>
+              Validez vos compétences avec les QCM techniques et rencontrez les recruteurs.
+            </Text>
+          </View>
+        </View>
       </View>
 
       {/* Top Entreprises qui recrutent */}
@@ -560,6 +643,59 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 14,
     fontWeight: '700',
+  },
+  workSection: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 16,
+    padding: 18,
+    marginVertical: 14,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  workSectionTitle: {
+    fontSize: 17,
+    fontWeight: '800',
+    color: COLORS.secondary,
+    textAlign: 'center',
+  },
+  workSectionSub: {
+    fontSize: 12,
+    color: COLORS.textMuted,
+    textAlign: 'center',
+    marginTop: 4,
+    marginBottom: 16,
+  },
+  workStepCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F8FAFC',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#F1F5F9',
+  },
+  workStepIconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  workStepContent: {
+    flex: 1,
+  },
+  workStepName: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: COLORS.secondary,
+  },
+  workStepDesc: {
+    fontSize: 11,
+    color: COLORS.textMuted,
+    marginTop: 2,
+    lineHeight: 15,
   },
 });
 

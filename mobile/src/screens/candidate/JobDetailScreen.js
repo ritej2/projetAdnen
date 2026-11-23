@@ -16,12 +16,13 @@ import applicationService from '../../services/applicationService';
 import testService from '../../services/testService';
 import CustomButton from '../../components/CustomButton';
 import { useAuth } from '../../context/AuthContext';
+import { SEED_JOBS } from '../../utils/seedData';
 
 export const JobDetailScreen = ({ route, navigation }) => {
   const { user, isCandidate } = useAuth();
   const { jobId } = route.params;
-  const [job, setJob] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [job, setJob] = useState(SEED_JOBS.find((j) => j.id === Number(jobId)) || null);
+  const [loading, setLoading] = useState(false);
   const [hasApplied, setHasApplied] = useState(false);
   const [test, setTest] = useState(null);
 
@@ -29,9 +30,16 @@ export const JobDetailScreen = ({ route, navigation }) => {
     const fetchData = async () => {
       try {
         const jobData = await jobService.getJobById(jobId);
-        setJob(jobData);
+        if (jobData) {
+          setJob(jobData);
+        }
+      } catch (err) {
+        const fallback = SEED_JOBS.find((j) => j.id === Number(jobId)) || SEED_JOBS[0];
+        setJob(fallback);
+      }
 
-        // Vérifier si le candidat a déjà postulé
+      // Vérifier si le candidat a déjà postulé
+      if (user && isCandidate) {
         try {
           const myApps = await applicationService.getMyApplications();
           const match = myApps.find((a) => a.offreId === Number(jobId));
@@ -39,23 +47,19 @@ export const JobDetailScreen = ({ route, navigation }) => {
             setHasApplied(true);
           }
         } catch {}
-
-        // Vérifier s'il y a un test technique associé
-        try {
-          const tests = await testService.getTestsForJob(jobId);
-          if (tests && tests.length > 0) {
-            setTest(tests[0]);
-          }
-        } catch {}
-      } catch (err) {
-        Alert.alert('Erreur', 'Impossible de charger les détails de l’offre.');
-      } finally {
-        setLoading(false);
       }
+
+      // Vérifier s'il y a un test technique associé
+      try {
+        const tests = await testService.getTestsForJob(jobId);
+        if (tests && tests.length > 0) {
+          setTest(tests[0]);
+        }
+      } catch {}
     };
 
     fetchData();
-  }, [jobId]);
+  }, [jobId, user, isCandidate]);
 
   if (loading || !job) {
     return (
@@ -129,6 +133,23 @@ export const JobDetailScreen = ({ route, navigation }) => {
           </View>
 
           <Text style={styles.dateText}>Publiée le {formatDate(job.datePublication)}</Text>
+
+          {/* Bouton Postuler Direct En-tête */}
+          {hasApplied ? (
+            <View style={[styles.alreadyAppliedBox, { marginTop: 14, width: '100%' }]}>
+              <MaterialCommunityIcons name="check-circle" size={18} color="#16a34a" />
+              <Text style={styles.alreadyAppliedText}>Candidature déjà envoyée</Text>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={styles.headerApplyBtn}
+              activeOpacity={0.85}
+              onPress={handleApplyPress}
+            >
+              <MaterialCommunityIcons name="send" size={16} color="#FFFFFF" />
+              <Text style={styles.headerApplyBtnText}>Postuler à cette offre</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Bloc Test Technique disponible */}
@@ -386,6 +407,23 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginLeft: 8,
     fontSize: 15,
+  },
+  headerApplyBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    marginTop: 14,
+    width: '100%',
+    gap: 8,
+  },
+  headerApplyBtnText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '700',
   },
 });
 

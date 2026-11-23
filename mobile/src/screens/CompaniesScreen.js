@@ -13,11 +13,12 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../utils/constants';
 import api from '../services/api';
+import { SEED_COMPANIES } from '../utils/seedData';
 
 export const CompaniesScreen = ({ navigation }) => {
-  const [companies, setCompanies] = useState([]);
+  const [companies, setCompanies] = useState(SEED_COMPANIES);
   const [search, setSearch] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchCompanies = useCallback(async () => {
@@ -29,9 +30,11 @@ export const CompaniesScreen = ({ navigation }) => {
         : Array.isArray(raw?.content)
         ? raw.content
         : [];
-      setCompanies(list.filter(Boolean));
+      if (list.length > 0) {
+        setCompanies(list.filter(Boolean));
+      }
     } catch (err) {
-      console.log('Erreur chargement entreprises:', err?.message);
+      console.log('Erreur chargement entreprises (fallback seed):', err?.message);
     } finally {
       setLoading(false);
       setRefreshing(false);

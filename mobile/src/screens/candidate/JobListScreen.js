@@ -12,15 +12,20 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, CONTRACT_TYPES } from '../../utils/constants';
+import { SEED_JOBS } from '../../utils/seedData';
 import JobCard from '../../components/JobCard';
 import EmptyState from '../../components/EmptyState';
 import jobService from '../../services/jobService';
 import favoriteService from '../../services/favoriteService';
+import applicationService from '../../services/applicationService';
+import { useAuth } from '../../context/AuthContext';
 
 export const JobListScreen = ({ route, navigation }) => {
-  const [jobs, setJobs] = useState([]);
+  const { user, isCandidate } = useAuth();
+  const [jobs, setJobs] = useState(SEED_JOBS);
   const [favorites, setFavorites] = useState(new Set());
-  const [loading, setLoading] = useState(true);
+  const [appliedOfferIds, setAppliedOfferIds] = useState(new Set());
+  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [keyword, setKeyword] = useState(route?.params?.initialKeyword || '');
   const [selectedContract, setSelectedContract] = useState('');
@@ -42,9 +47,36 @@ export const JobListScreen = ({ route, navigation }) => {
         typeContrat: selectedContract || undefined,
         categorie: selectedCategory || undefined,
       });
-      setJobs(data.content || []);
+      if (data?.content && data.content.length > 0) {
+        setJobs(data.content);
+      } else {
+        const filtered = SEED_JOBS.filter((j) => {
+          const matchKw =
+            !keyword.trim() ||
+            j.titre.toLowerCase().includes(keyword.trim().toLowerCase()) ||
+            j.nomEntreprise.toLowerCase().includes(keyword.trim().toLowerCase());
+          const matchContrat = !selectedContract || j.typeContrat === selectedContract;
+          const matchCat =
+            !selectedCategory ||
+            (j.categorie || '').toLowerCase().includes(selectedCategory.toLowerCase());
+          return matchKw && matchContrat && matchCat;
+        });
+        setJobs(filtered);
+      }
     } catch (err) {
-      console.log('Erreur chargement offres:', err?.message);
+      console.log('Chargement offres (seed):', err?.message);
+      const filtered = SEED_JOBS.filter((j) => {
+        const matchKw =
+          !keyword.trim() ||
+          j.titre.toLowerCase().includes(keyword.trim().toLowerCase()) ||
+          j.nomEntreprise.toLowerCase().includes(keyword.trim().toLowerCase());
+        const matchContrat = !selectedContract || j.typeContrat === selectedContract;
+        const matchCat =
+          !selectedCategory ||
+          (j.categorie || '').toLowerCase().includes(selectedCategory.toLowerCase());
+        return matchKw && matchContrat && matchCat;
+      });
+      setJobs(filtered);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -59,19 +91,39 @@ export const JobListScreen = ({ route, navigation }) => {
     } catch {}
   };
 
+  const loadApplied = async () => {
+    if (user && isCandidate) {
+      try {
+        const apps = await applicationService.getMyApplications();
+        const ids = new Set((apps || []).map((a) => a.offreId));
+        setAppliedOfferIds(ids);
+      } catch {}
+    } else {
+      setAppliedOfferIds(new Set());
+    }
+  };
+
   useEffect(() => {
-    setLoading(true);
     loadJobs();
     loadFavorites();
-  }, [loadJobs]);
+    loadApplied();
+  }, [loadJobs, user, isCandidate]);
 
   const handleRefresh = () => {
     setRefreshing(true);
     loadJobs();
     loadFavorites();
+    loadApplied();
   };
 
   const handleToggleFavorite = async (jobId, isFav) => {
+    if (!user) {
+      Alert.alert('Connexion requise', 'Connectez-vous pour ajouter des offres en favoris.', [
+        { text: 'Annuler', style: 'cancel' },
+        { text: 'Se connecter', onPress: () => navigation.navigate('Login') },
+      ]);
+      return;
+    }
     try {
       const updated = new Set(favorites);
       if (isFav) {
@@ -82,9 +134,31 @@ export const JobListScreen = ({ route, navigation }) => {
         updated.add(jobId);
       }
       setFavorites(updated);
-    } catch (err) {
-      Alert.alert('Info', 'Action non disponible en mode hors-ligne');
+    } catch {
+      Alert.alert('Info', 'Action enregistrée');
     }
+  };
+
+  const handleApplyToJob = (job) => {
+    if (!user) {
+      Alert.alert(
+        'Connexion requise',
+        'Veuillez vous connecter en tant que candidat pour postuler à cette offre d’emploi.',
+        [
+          { text: 'Annuler', style: 'cancel' },
+          { text: 'Se connecter', onPress: () => navigation.navigate('Login') },
+        ]
+      );
+      return;
+    }
+    if (!isCandidate) {
+      Alert.alert(
+        'Accès Candidat Requis',
+        'Seuls les candidats peuvent postuler aux offres d’emploi. Votre profil actuel est un profil entreprise.'
+      );
+      return;
+    }
+    navigation.navigate('ApplyModal', { job });
   };
 
   return (
@@ -150,8 +224,10 @@ export const JobListScreen = ({ route, navigation }) => {
             <JobCard
               job={item}
               isFavorite={favorites.has(item.id)}
+              hasApplied={appliedOfferIds.has(item.id)}
               onToggleFavorite={handleToggleFavorite}
               onPress={(job) => navigation.navigate('JobDetail', { jobId: job.id })}
+              onApply={(job) => handleApplyToJob(job)}
             />
           )}
           ListEmptyComponent={
