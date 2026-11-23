@@ -14,6 +14,7 @@ import { COLORS } from '../../utils/constants';
 import { useAuth } from '../../context/AuthContext';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
+import AppLogo from '../../components/AppLogo';
 
 export const RegisterScreen = ({ navigation }) => {
   const { register, isLoading } = useAuth();
@@ -70,6 +71,10 @@ export const RegisterScreen = ({ navigation }) => {
           <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
           <Text style={styles.backBtnText}>Retour</Text>
         </TouchableOpacity>
+
+        <View style={{ alignItems: 'center', marginBottom: 16 }}>
+          <AppLogo size="medium" />
+        </View>
 
         <Text style={styles.pageTitle}>Créer un compte</Text>
         <Text style={styles.subtitle}>Rejoignez la communauté JobFlow</Text>

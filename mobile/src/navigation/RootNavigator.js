@@ -19,6 +19,7 @@ import CreateJobScreen from '../screens/company/CreateJobScreen';
 import CompanyApplicationsScreen from '../screens/company/CompanyApplicationsScreen';
 import ScheduleInterviewScreen from '../screens/company/ScheduleInterviewScreen';
 import CompanyProfileScreen from '../screens/company/CompanyProfileScreen';
+import AITestChatbotScreen from '../screens/company/AITestChatbotScreen';
 
 import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
@@ -115,6 +116,11 @@ export const RootNavigator = () => {
           name="CompanyProfile"
           component={CompanyProfileScreen}
           options={{ title: 'Fiche Entreprise' }}
+        />
+        <Stack.Screen
+          name="AITestChatbot"
+          component={AITestChatbotScreen}
+          options={{ title: 'Studio Test IA (Chatbot)' }}
         />
 
         {/* Auth Screens */}

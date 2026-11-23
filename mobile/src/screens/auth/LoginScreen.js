@@ -15,6 +15,7 @@ import { useAuth } from '../../context/AuthContext';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
 import { setCustomApiHost, api } from '../../services/api';
+import AppLogo from '../../components/AppLogo';
 
 export const LoginScreen = ({ navigation }) => {
   const { login, loginDemo, isLoading } = useAuth();
@@ -63,11 +64,7 @@ export const LoginScreen = ({ navigation }) => {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.header}>
-          <View style={styles.logoBadge}>
-            <MaterialCommunityIcons name="briefcase-check" size={38} color="#ffffff" />
-          </View>
-          <Text style={styles.brandTitle}>JobFlow</Text>
-          <Text style={styles.subtitle}>Plateforme de recrutement connectée</Text>
+          <AppLogo size="large" showTagline />
         </View>
 
         <View style={styles.card}>

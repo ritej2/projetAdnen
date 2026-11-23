@@ -18,6 +18,7 @@ import interviewService from '../services/interviewService';
 import jobService from '../services/jobService';
 import { setCustomApiHost, api } from '../services/api';
 import { getCandidateAvatarAsset, getCompanyLogoAsset } from '../utils/assets';
+import AppLogo from '../components/AppLogo';
 
 export const AccountScreen = ({ navigation }) => {
   const { user, isCandidate, isCompany, logout, loginDemo, isLoading } = useAuth();
@@ -73,8 +74,8 @@ export const AccountScreen = ({ navigation }) => {
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         <View style={styles.authHeroCard}>
-          <View style={styles.logoBadge}>
-            <MaterialCommunityIcons name="account-circle-outline" size={44} color={COLORS.primary} />
+          <View style={{ marginBottom: 12 }}>
+            <AppLogo size="large" />
           </View>
           <Text style={styles.authHeroTitle}>Mon Espace JobFlow</Text>
           <Text style={styles.authHeroSub}>
@@ -237,6 +238,17 @@ export const AccountScreen = ({ navigation }) => {
 
           <TouchableOpacity
             style={styles.menuItem}
+            onPress={() => navigation.navigate('TakeTest', { testId: 1, jobId: 1 })}
+          >
+            <View style={[styles.menuIcon, { backgroundColor: '#EDE9FE' }]}>
+              <MaterialCommunityIcons name="certificate-outline" size={20} color="#7C3AED" />
+            </View>
+            <Text style={styles.menuText}>Tests Techniques QCM</Text>
+            <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.textMuted} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.menuItem}
             onPress={() => navigation.navigate('CandidateProfile')}
           >
             <View style={[styles.menuIcon, { backgroundColor: '#FEF3C7' }]}>
@@ -323,6 +335,17 @@ export const AccountScreen = ({ navigation }) => {
             <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#7C3AED" />
           </View>
           <Text style={styles.menuText}>Publier une Nouvelle Offre</Text>
+          <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.textMuted} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('AITestChatbot')}
+        >
+          <View style={[styles.menuIcon, { backgroundColor: '#EEF2FF' }]}>
+            <MaterialCommunityIcons name="robot" size={20} color="#4F46E5" />
+          </View>
+          <Text style={styles.menuText}>Générateur Tests QCM (Agent IA)</Text>
           <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.textMuted} />
         </TouchableOpacity>
 

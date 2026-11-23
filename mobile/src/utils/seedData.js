@@ -166,3 +166,60 @@ export const SEED_COMPANIES = [
     verifiee: true,
   },
 ];
+
+// Test technique QCM miroir de DataSeeder.java
+export const SEED_TEST = {
+  id: 1,
+  titre: 'Évaluation Technique IA - Full Stack & Cloud',
+  description: 'Test d’aptitude technique : SQL, Architecture, Java 21, React & Sécurité.',
+  dureeMinutes: 15,
+  scoreMinimum: 60,
+  genereParIa: true,
+  questions: [
+    {
+      id: 1,
+      enonce: 'Quelle commande SQL permet de filtrer après un regroupement GROUP BY ?',
+      options: ['WHERE', 'HAVING', 'GROUP BY', 'ORDER BY'],
+      bonneReponse: 1,
+      explication: 'HAVING s’applique après GROUP BY pour filtrer sur les agrégats.',
+    },
+    {
+      id: 2,
+      enonce: 'Quel index optimise les recherches d’égalité exacte dans une base relationnelle ?',
+      options: ['B-Tree / Hash', 'Full-Text', 'Spatial', 'GiST'],
+      bonneReponse: 0,
+      explication: 'L’index Hash ou B-Tree est idéal pour la recherche par clé exacte.',
+    },
+    {
+      id: 3,
+      enonce: 'En Java 21, quelle fonctionnalité permet d’exécuter des millions de threads légers ?',
+      options: [
+        'Virtual Threads (Project Loom)',
+        'Fibers C++',
+        'Reactive RxJava',
+        'SingleThreadExecutor',
+      ],
+      bonneReponse: 0,
+      explication: 'Les Virtual Threads de Java 21 réduisent drastiquement le coût mémoire des threads.',
+    },
+    {
+      id: 4,
+      enonce: 'Que garantit le principe ACID dans une transaction de base de données ?',
+      options: [
+        'Atomicité, Cohérence, Isolation, Durabilité',
+        'Vitesse maximale d’écriture',
+        'Compression automatique des données',
+        'Chiffrement SSL de bout en bout',
+      ],
+      bonneReponse: 0,
+      explication: 'ACID = Atomicité, Cohérence, Isolation, Durabilité.',
+    },
+    {
+      id: 5,
+      enonce: 'Quel hook React permet de mémoriser un calcul coûteux entre les rendus ?',
+      options: ['useMemo', 'useEffect', 'useCallback', 'useState'],
+      bonneReponse: 0,
+      explication: 'useMemo mémorise une valeur calculée et évite les recalculs inutiles.',
+    },
+  ],
+};

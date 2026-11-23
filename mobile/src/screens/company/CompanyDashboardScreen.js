@@ -75,7 +75,7 @@ export const CompanyDashboardScreen = ({ navigation }) => {
       <View style={styles.statsGrid}>
         <TouchableOpacity
           style={styles.statCard}
-          onPress={() => navigation.navigate('CompanyJobsTab')}
+          onPress={() => navigation.navigate('CompanyJobs')}
         >
           <View style={[styles.statIconBox, { backgroundColor: '#dbeafe' }]}>
             <MaterialCommunityIcons name="briefcase" size={24} color={COLORS.primary} />
@@ -86,7 +86,7 @@ export const CompanyDashboardScreen = ({ navigation }) => {
 
         <TouchableOpacity
           style={styles.statCard}
-          onPress={() => navigation.navigate('CompanyApplicationsTab')}
+          onPress={() => navigation.navigate('CompanyApplications')}
         >
           <View style={[styles.statIconBox, { backgroundColor: '#fef3c7' }]}>
             <MaterialCommunityIcons name="account-clock" size={24} color="#d97706" />
@@ -97,7 +97,7 @@ export const CompanyDashboardScreen = ({ navigation }) => {
 
         <TouchableOpacity
           style={styles.statCard}
-          onPress={() => navigation.navigate('CompanyInterviewsTab')}
+          onPress={() => navigation.navigate('Interviews')}
         >
           <View style={[styles.statIconBox, { backgroundColor: '#ede9fe' }]}>
             <MaterialCommunityIcons name="calendar-check" size={24} color="#7c3aed" />
@@ -124,10 +124,31 @@ export const CompanyDashboardScreen = ({ navigation }) => {
         </View>
       </TouchableOpacity>
 
+      {/* Action IA : Studio Chatbot Créateur de Tests QCM */}
+      <TouchableOpacity
+        style={styles.aiStudioBanner}
+        onPress={() => navigation.navigate('AITestChatbot')}
+        activeOpacity={0.85}
+      >
+        <View style={styles.aiStudioIconBox}>
+          <MaterialCommunityIcons name="robot" size={26} color="#FFFFFF" />
+        </View>
+        <View style={{ flex: 1, marginRight: 8 }}>
+          <View style={styles.aiPill}>
+            <Text style={styles.aiPillText}>AGENT IA RECRUTEMENT</Text>
+          </View>
+          <Text style={styles.aiStudioTitle}>Créer un Test QCM avec l'IA</Text>
+          <Text style={styles.aiStudioSubtitle}>
+            Discutez avec l'agent IA pour concevoir automatiquement des questions techniques adaptées.
+          </Text>
+        </View>
+        <MaterialCommunityIcons name="chevron-right" size={22} color="#6366F1" />
+      </TouchableOpacity>
+
       {/* Dernières candidatures reçues */}
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Candidatures récentes</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('CompanyApplicationsTab')}>
+        <TouchableOpacity onPress={() => navigation.navigate('CompanyApplications')}>
           <Text style={styles.viewAllText}>Voir tout</Text>
         </TouchableOpacity>
       </View>
@@ -144,7 +165,7 @@ export const CompanyDashboardScreen = ({ navigation }) => {
             key={app.id}
             application={app}
             isRecruiterView
-            onPress={() => navigation.navigate('CompanyApplicationsTab')}
+            onPress={() => navigation.navigate('CompanyApplications')}
           />
         ))
       )}
@@ -239,6 +260,50 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 12,
+  },
+  aiStudioBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EEF2FF',
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#C7D2FE',
+    marginBottom: 20,
+  },
+  aiStudioIconBox: {
+    width: 46,
+    height: 46,
+    borderRadius: 12,
+    backgroundColor: '#6366F1',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  aiPill: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#E0E7FF',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+    marginBottom: 4,
+  },
+  aiPillText: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#4F46E5',
+    letterSpacing: 0.5,
+  },
+  aiStudioTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#1E1B4B',
+  },
+  aiStudioSubtitle: {
+    fontSize: 11,
+    color: '#4338CA',
+    marginTop: 2,
+    lineHeight: 15,
   },
   sectionHeader: {
     flexDirection: 'row',

@@ -5,7 +5,12 @@ import { COLORS } from '../utils/constants';
 import StatusBadge from './StatusBadge';
 import { formatDate } from '../utils/formatters';
 
-export const ApplicationCard = ({ application, onPress, isRecruiterView = false }) => {
+export const ApplicationCard = ({
+  application,
+  onPress,
+  onTakeTest,
+  isRecruiterView = false,
+}) => {
   return (
     <TouchableOpacity
       activeOpacity={0.7}
@@ -56,6 +61,18 @@ export const ApplicationCard = ({ application, onPress, isRecruiterView = false 
           <Text style={styles.noteText}>{application.noteRecruteur}</Text>
         </View>
       ) : null}
+
+      {!isRecruiterView && onTakeTest && (
+        <TouchableOpacity
+          style={styles.takeTestBtn}
+          activeOpacity={0.8}
+          onPress={() => onTakeTest(application)}
+        >
+          <MaterialCommunityIcons name="certificate-outline" size={16} color="#4F46E5" />
+          <Text style={styles.takeTestBtnText}>Passer le Test Technique QCM</Text>
+          <MaterialCommunityIcons name="chevron-right" size={16} color="#4F46E5" />
+        </TouchableOpacity>
+      )}
     </TouchableOpacity>
   );
 };
@@ -145,6 +162,25 @@ const styles = StyleSheet.create({
   noteText: {
     fontSize: 12,
     color: '#b45309',
+  },
+  takeTestBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#EEF2FF',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 10,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: '#C7D2FE',
+  },
+  takeTestBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#4F46E5',
+    flex: 1,
+    marginLeft: 8,
   },
 });
 

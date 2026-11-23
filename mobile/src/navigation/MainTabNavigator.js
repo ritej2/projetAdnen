@@ -8,6 +8,7 @@ import HomeScreen from '../screens/HomeScreen';
 import JobListScreen from '../screens/candidate/JobListScreen';
 import CompaniesScreen from '../screens/CompaniesScreen';
 import AccountScreen from '../screens/AccountScreen';
+import AppLogo from '../components/AppLogo';
 
 const Tab = createBottomTabNavigator();
 
@@ -50,7 +51,7 @@ export const MainTabNavigator = () => {
         name="HomeTab"
         component={HomeScreen}
         options={{
-          title: 'JobFlow',
+          headerTitle: () => <AppLogo size="medium" />,
           tabBarLabel: 'Accueil',
           tabBarIcon: ({ color, size, focused }) => (
             <MaterialCommunityIcons

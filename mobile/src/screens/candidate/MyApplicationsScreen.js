@@ -101,6 +101,12 @@ export const MyApplicationsScreen = ({ navigation }) => {
             <ApplicationCard
               application={item}
               onPress={handleAction}
+              onTakeTest={(app) =>
+                navigation.navigate('TakeTest', {
+                  testId: 1,
+                  jobId: app.offreId,
+                })
+              }
             />
           )}
           ListEmptyComponent={
