@@ -17,19 +17,30 @@ import EmptyState from '../../components/EmptyState';
 import jobService from '../../services/jobService';
 import favoriteService from '../../services/favoriteService';
 
-export const JobListScreen = ({ navigation }) => {
+export const JobListScreen = ({ route, navigation }) => {
   const [jobs, setJobs] = useState([]);
   const [favorites, setFavorites] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [keyword, setKeyword] = useState('');
+  const [keyword, setKeyword] = useState(route?.params?.initialKeyword || '');
   const [selectedContract, setSelectedContract] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState(route?.params?.initialCategory || '');
+
+  useEffect(() => {
+    if (route?.params?.initialKeyword !== undefined) {
+      setKeyword(route.params.initialKeyword);
+    }
+    if (route?.params?.initialCategory !== undefined) {
+      setSelectedCategory(route.params.initialCategory);
+    }
+  }, [route?.params?.initialKeyword, route?.params?.initialCategory]);
 
   const loadJobs = useCallback(async () => {
     try {
       const data = await jobService.getJobs({
         keyword: keyword.trim() || undefined,
         typeContrat: selectedContract || undefined,
+        categorie: selectedCategory || undefined,
       });
       setJobs(data.content || []);
     } catch (err) {
@@ -38,7 +49,7 @@ export const JobListScreen = ({ navigation }) => {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [keyword, selectedContract]);
+  }, [keyword, selectedContract, selectedCategory]);
 
   const loadFavorites = async () => {
     try {

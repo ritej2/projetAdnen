@@ -15,8 +15,10 @@ import jobService from '../../services/jobService';
 import applicationService from '../../services/applicationService';
 import testService from '../../services/testService';
 import CustomButton from '../../components/CustomButton';
+import { useAuth } from '../../context/AuthContext';
 
 export const JobDetailScreen = ({ route, navigation }) => {
+  const { user, isCandidate } = useAuth();
   const { jobId } = route.params;
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -66,6 +68,28 @@ export const JobDetailScreen = ({ route, navigation }) => {
   const skillsList = job.competencesRequises
     ? job.competencesRequises.split(',').map((s) => s.trim()).filter(Boolean)
     : [];
+
+  const handleApplyPress = () => {
+    if (!user) {
+      Alert.alert(
+        'Connexion requise',
+        'Veuillez vous connecter en tant que candidat pour postuler à cette offre d’emploi.',
+        [
+          { text: 'Annuler', style: 'cancel' },
+          { text: 'Se connecter', onPress: () => navigation.navigate('Login') },
+        ]
+      );
+      return;
+    }
+    if (!isCandidate) {
+      Alert.alert(
+        'Accès Candidat Requis',
+        'Seuls les candidats peuvent postuler aux offres d’emploi. Votre compte actuel est un compte entreprise.'
+      );
+      return;
+    }
+    navigation.navigate('ApplyModal', { job });
+  };
 
   return (
     <View style={styles.container}>
@@ -175,7 +199,7 @@ export const JobDetailScreen = ({ route, navigation }) => {
         ) : (
           <CustomButton
             title="Postuler à cette offre"
-            onPress={() => navigation.navigate('ApplyModal', { job })}
+            onPress={handleApplyPress}
             icon={<MaterialCommunityIcons name="send" size={18} color="#ffffff" />}
           />
         )}
