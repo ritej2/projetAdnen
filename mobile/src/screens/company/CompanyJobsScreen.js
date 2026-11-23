@@ -68,7 +68,7 @@ export const CompanyJobsScreen = ({ navigation }) => {
       ) : (
         <FlatList
           data={jobs}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item, index) => (item?.id ? String(item.id) : `job-${index}`)}
           contentContainerStyle={styles.listContent}
           refreshControl={
             <RefreshControl

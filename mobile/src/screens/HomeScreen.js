@@ -47,8 +47,13 @@ export const HomeScreen = ({ navigation }) => {
       }
 
       if (compData.status === 'fulfilled') {
-        const list = compData.value?.data || [];
-        setCompanies(list);
+        const raw = compData.value?.data;
+        const list = Array.isArray(raw)
+          ? raw
+          : Array.isArray(raw?.content)
+          ? raw.content
+          : [];
+        setCompanies(list.filter(Boolean));
         if (list.length > 0) {
           setStats((prev) => ({ ...prev, totalCompanies: list.length }));
         }
@@ -226,28 +231,33 @@ export const HomeScreen = ({ navigation }) => {
             horizontal
             showsHorizontalScrollIndicator={false}
             data={companies}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item, index) =>
+              item?.id !== undefined && item?.id !== null
+                ? String(item.id)
+                : `company-${index}`
+            }
             contentContainerStyle={styles.companiesList}
-            renderItem={({ item }) => (
+            renderItem={({ item, index }) => (
               <TouchableOpacity
+                key={item?.id ? `comp-${item.id}` : `comp-${index}`}
                 style={styles.companyCard}
                 activeOpacity={0.8}
                 onPress={() => navigation.navigate('CompaniesTab')}
               >
                 <View style={styles.companyLogoPlaceholder}>
                   <Text style={styles.companyLogoLetter}>
-                    {(item.nomEntreprise || 'E').substring(0, 2).toUpperCase()}
+                    {(item?.nomEntreprise || 'E').substring(0, 2).toUpperCase()}
                   </Text>
                 </View>
                 <Text style={styles.companyNameText} numberOfLines={1}>
-                  {item.nomEntreprise}
+                  {item?.nomEntreprise || 'Entreprise Partenaire'}
                 </Text>
                 <Text style={styles.companySectorText} numberOfLines={1}>
-                  {item.secteur || 'Technologie'}
+                  {item?.secteur || 'Technologie'}
                 </Text>
                 <View style={styles.companyBadge}>
                   <Text style={styles.companyBadgeText}>
-                    {item.nombreOffresActives || 1} offre(s)
+                    {item?.nombreOffresActives || 1} offre(s)
                   </Text>
                 </View>
               </TouchableOpacity>

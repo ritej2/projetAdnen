@@ -23,7 +23,13 @@ export const CompaniesScreen = ({ navigation }) => {
   const fetchCompanies = useCallback(async () => {
     try {
       const res = await api.get('/api/entreprises');
-      setCompanies(res.data || []);
+      const raw = res?.data;
+      const list = Array.isArray(raw)
+        ? raw
+        : Array.isArray(raw?.content)
+        ? raw.content
+        : [];
+      setCompanies(list.filter(Boolean));
     } catch (err) {
       console.log('Erreur chargement entreprises:', err?.message);
     } finally {
@@ -165,7 +171,7 @@ export const CompaniesScreen = ({ navigation }) => {
       ) : (
         <FlatList
           data={filteredCompanies}
-          keyExtractor={(item) => (item.id ? item.id.toString() : Math.random().toString())}
+          keyExtractor={(item, index) => (item?.id ? String(item.id) : `company-${index}`)}
           renderItem={renderCompanyCard}
           contentContainerStyle={styles.listContent}
           refreshControl={

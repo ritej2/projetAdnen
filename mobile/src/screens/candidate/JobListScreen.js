@@ -141,7 +141,7 @@ export const JobListScreen = ({ route, navigation }) => {
       ) : (
         <FlatList
           data={jobs}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item, index) => (item?.id ? String(item.id) : `job-${index}`)}
           contentContainerStyle={styles.listContent}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} colors={[COLORS.primary]} />

@@ -58,7 +58,7 @@ export const InterviewsScreen = () => {
       ) : (
         <FlatList
           data={interviews}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item, index) => (item?.id ? String(item.id) : `interview-${index}`)}
           contentContainerStyle={styles.listContent}
           refreshControl={
             <RefreshControl

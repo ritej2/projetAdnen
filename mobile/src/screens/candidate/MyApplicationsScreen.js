@@ -85,7 +85,7 @@ export const MyApplicationsScreen = ({ navigation }) => {
       ) : (
         <FlatList
           data={applications}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item, index) => (item?.id ? String(item.id) : `application-${index}`)}
           contentContainerStyle={styles.listContent}
           refreshControl={
             <RefreshControl
