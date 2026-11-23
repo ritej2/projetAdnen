@@ -19,24 +19,46 @@ import jobService from '../services/jobService';
 import { setCustomApiHost, api } from '../services/api';
 import { getCandidateAvatarAsset, getCompanyLogoAsset } from '../utils/assets';
 import AppLogo from '../components/AppLogo';
+import { formatDate } from '../utils/formatters';
+import {
+  SEED_JOBS,
+  SEED_CANDIDATE_APPLICATIONS,
+  SEED_CANDIDATE_INTERVIEWS,
+  SEED_CANDIDATE_TESTS,
+} from '../utils/seedData';
+import JobCard from '../components/JobCard';
+import testService from '../services/testService';
 
 export const AccountScreen = ({ navigation }) => {
-  const { user, isCandidate, isCompany, logout, loginDemo, isLoading } = useAuth();
-  const [candidateStats, setCandidateStats] = useState({ applications: 0, interviews: 0 });
+  const { user, candidat, isCandidate, isCompany, logout, loginDemo, isLoading } = useAuth();
+  const [candidateStats, setCandidateStats] = useState({ applications: 7, interviews: 1 });
   const [companyStats, setCompanyStats] = useState({ jobs: 0, applications: 0 });
   const [showServerConfig, setShowServerConfig] = useState(false);
   const [hostInput, setHostInput] = useState(api.defaults.baseURL || '');
+
+  // Tabs et données complètes Espace Candidat (identique au web)
+  const [activeTab, setActiveTab] = useState('postes'); // 'postes' | 'entretiens' | 'favoris' | 'tests'
+  const [candidateApps, setCandidateApps] = useState(SEED_CANDIDATE_APPLICATIONS);
+  const [candidateInterviews, setCandidateInterviews] = useState(SEED_CANDIDATE_INTERVIEWS);
+  const [candidateFavorites, setCandidateFavorites] = useState([SEED_JOBS[0], SEED_JOBS[1]]);
+  const [candidateTests, setCandidateTests] = useState(SEED_CANDIDATE_TESTS);
 
   useEffect(() => {
     if (user && isCandidate) {
       Promise.allSettled([
         applicationService.getMyApplications(),
         interviewService.getMyInterviews(),
-      ]).then(([appsRes, intsRes]) => {
-        setCandidateStats({
-          applications: appsRes.status === 'fulfilled' ? (appsRes.value || []).length : 0,
-          interviews: intsRes.status === 'fulfilled' ? (intsRes.value || []).length : 0,
-        });
+        testService.getMyAttempts(),
+      ]).then(([appsRes, intsRes, testsRes]) => {
+        if (appsRes.status === 'fulfilled' && appsRes.value && appsRes.value.length > 0) {
+          setCandidateApps(appsRes.value);
+        }
+        if (intsRes.status === 'fulfilled' && intsRes.value && intsRes.value.length > 0) {
+          setCandidateInterviews(intsRes.value);
+        }
+        if (testsRes.status === 'fulfilled' && testsRes.value && testsRes.value.length > 0) {
+          setCandidateTests(testsRes.value);
+        }
       });
     } else if (user && isCompany) {
       Promise.allSettled([
@@ -176,93 +198,306 @@ export const AccountScreen = ({ navigation }) => {
     );
   }
 
-  // 2. CANDIDAT CONNECTÉ
+  // 2. CANDIDAT CONNECTÉ (Exacte interface web utilisateur)
   if (isCandidate) {
-    const initial = (user.nom || 'C').charAt(0).toUpperCase();
+    const candidateInitial = (user?.nom || 'M').charAt(0).toUpperCase();
 
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        {/* En-tête profil */}
-        <View style={styles.userHeaderCard}>
-          <View style={[styles.avatarBox, { overflow: 'hidden' }]}>
-            <Image
-              source={getCandidateAvatarAsset(user?.id || 1)}
-              style={styles.avatarImage}
-              resizeMode="cover"
+        {/* Titre officiel */}
+        <View style={styles.candidateTopRow}>
+          <Text style={styles.candidatePageTitle}>Espace CANDIDAT</Text>
+        </View>
+
+        {/* Carte profil Candidat */}
+        <View style={styles.candidateProfileHeaderCard}>
+          <View style={styles.candidateAvatarCircle}>
+            <Text style={styles.candidateAvatarText}>{candidateInitial}</Text>
+          </View>
+
+          <View style={styles.candidateInfoCol}>
+            <Text style={styles.candidateFullName}>{user?.nom || 'Marie Dubois'}</Text>
+            <Text style={styles.candidateTitreRole}>
+              {candidat?.titreProfil || 'Ingénieure Full Stack Java / React'}
+            </Text>
+            <Text style={styles.candidateEmailText}>
+              {user?.email || 'marie.dubois@talentflow.io'}
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            style={styles.candidateLogoutIconBtn}
+            onPress={logout}
+            activeOpacity={0.7}
+          >
+            <MaterialCommunityIcons name="logout" size={22} color="#EF4444" />
+          </TouchableOpacity>
+        </View>
+
+        {/* 4 Onglets Horizontaux Miroir du Web */}
+        <View style={styles.candidateTabsBar}>
+          <TouchableOpacity
+            style={[styles.candidateTabItem, activeTab === 'postes' && styles.candidateTabActive]}
+            onPress={() => setActiveTab('postes')}
+            activeOpacity={0.7}
+          >
+            <MaterialCommunityIcons
+              name="briefcase-outline"
+              size={18}
+              color={activeTab === 'postes' ? COLORS.primary : COLORS.textMuted}
             />
-          </View>
-          <View style={styles.userHeaderInfo}>
-            <Text style={styles.userName}>{user.nom || 'Candidat'}</Text>
-            <Text style={styles.userEmail}>{user.email}</Text>
-            <View style={styles.roleBadgeCandidate}>
-              <Text style={styles.roleBadgeCandidateText}>Espace Candidat</Text>
-            </View>
-          </View>
+            <Text
+              style={[
+                styles.candidateTabText,
+                activeTab === 'postes' && styles.candidateTabTextActive,
+              ]}
+            >
+              Postes ({candidateApps.length})
+            </Text>
+            {activeTab === 'postes' && <View style={styles.candidateTabIndicator} />}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.candidateTabItem,
+              activeTab === 'entretiens' && styles.candidateTabActive,
+            ]}
+            onPress={() => setActiveTab('entretiens')}
+            activeOpacity={0.7}
+          >
+            <MaterialCommunityIcons
+              name="calendar-clock"
+              size={18}
+              color={activeTab === 'entretiens' ? COLORS.primary : COLORS.textMuted}
+            />
+            <Text
+              style={[
+                styles.candidateTabText,
+                activeTab === 'entretiens' && styles.candidateTabTextActive,
+              ]}
+            >
+              Entretiens ({candidateInterviews.length})
+            </Text>
+            {activeTab === 'entretiens' && <View style={styles.candidateTabIndicator} />}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.candidateTabItem, activeTab === 'favoris' && styles.candidateTabActive]}
+            onPress={() => setActiveTab('favoris')}
+            activeOpacity={0.7}
+          >
+            <MaterialCommunityIcons
+              name="bookmark-outline"
+              size={18}
+              color={activeTab === 'favoris' ? COLORS.primary : COLORS.textMuted}
+            />
+            <Text
+              style={[
+                styles.candidateTabText,
+                activeTab === 'favoris' && styles.candidateTabTextActive,
+              ]}
+            >
+              Favoris ({candidateFavorites.length})
+            </Text>
+            {activeTab === 'favoris' && <View style={styles.candidateTabIndicator} />}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.candidateTabItem, activeTab === 'tests' && styles.candidateTabActive]}
+            onPress={() => setActiveTab('tests')}
+            activeOpacity={0.7}
+          >
+            <MaterialCommunityIcons
+              name="creation"
+              size={18}
+              color={activeTab === 'tests' ? COLORS.primary : COLORS.textMuted}
+            />
+            <Text
+              style={[
+                styles.candidateTabText,
+                activeTab === 'tests' && styles.candidateTabTextActive,
+              ]}
+            >
+              Tests ({candidateTests.length})
+            </Text>
+            {activeTab === 'tests' && <View style={styles.candidateTabIndicator} />}
+          </TouchableOpacity>
         </View>
 
-        {/* Statistiques Candidat */}
-        <View style={styles.statsGrid}>
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>{candidateStats.applications}</Text>
-            <Text style={styles.statLabel}>Candidatures</Text>
+        {/* CONTENU ONGLET 1 : POSTES & CANDIDATURES (EXACTE PHOTO) */}
+        {activeTab === 'postes' && (
+          <View style={styles.tabContentList}>
+            {candidateApps.map((item, idx) => (
+              <View key={item.id ? `app-${item.id}` : `app-${idx}`} style={styles.webJobCard}>
+                <View style={styles.webJobCardHeader}>
+                  <Text style={styles.webJobCardTitle} numberOfLines={2}>
+                    {item.offreTitre || item.titre || 'Offre d’emploi'}
+                  </Text>
+                  <View
+                    style={[
+                      styles.webStatusPill,
+                      item.statut === 'ACCEPTEE' && styles.webStatusPillAccepted,
+                      item.statut === 'ENTRETIEN' && styles.webStatusPillInterview,
+                      item.statut === 'REFUSEE' && styles.webStatusPillRefused,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.webStatusPillText,
+                        item.statut === 'ACCEPTEE' && styles.webStatusPillTextAccepted,
+                        item.statut === 'ENTRETIEN' && styles.webStatusPillTextInterview,
+                        item.statut === 'REFUSEE' && styles.webStatusPillTextRefused,
+                      ]}
+                    >
+                      {item.statut === 'ACCEPTEE'
+                        ? 'Acceptée'
+                        : item.statut === 'ENTRETIEN'
+                        ? 'Entretien'
+                        : item.statut === 'REFUSEE'
+                        ? 'Refusée'
+                        : 'En attente'}
+                    </Text>
+                  </View>
+                </View>
+
+                <Text style={styles.webJobCardCompany}>
+                  {item.nomEntreprise || 'rtat'} · {item.localisation || 'Paris, France'}
+                </Text>
+
+                <Text style={styles.webJobCardDate}>
+                  Postulé le {formatDate(item.dateCandidature)}
+                </Text>
+
+                {/* Grand bouton bleu officiel "✨ Passer le Test Technique IA" */}
+                <TouchableOpacity
+                  style={styles.webPassTestBtn}
+                  activeOpacity={0.85}
+                  onPress={() =>
+                    navigation.navigate('TakeTest', {
+                      jobId: item.offreId || item.id || 1,
+                      testId: 1,
+                    })
+                  }
+                >
+                  <MaterialCommunityIcons name="creation" size={18} color="#FFFFFF" />
+                  <Text style={styles.webPassTestBtnText}>Passer le Test Technique IA</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
           </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>{candidateStats.interviews}</Text>
-            <Text style={styles.statLabel}>Entretiens</Text>
+        )}
+
+        {/* CONTENU ONGLET 2 : ENTRETIENS PLANIFIÉS */}
+        {activeTab === 'entretiens' && (
+          <View style={styles.tabContentList}>
+            {candidateInterviews.map((item, idx) => (
+              <View key={item.id ? `int-${item.id}` : `int-${idx}`} style={styles.webJobCard}>
+                <View style={styles.webJobCardHeader}>
+                  <Text style={styles.webJobCardTitle}>{item.offreTitre}</Text>
+                  <View style={[styles.webStatusPill, styles.webStatusPillInterview]}>
+                    <Text style={[styles.webStatusPillText, styles.webStatusPillTextInterview]}>
+                      Planifié
+                    </Text>
+                  </View>
+                </View>
+
+                <Text style={styles.webJobCardCompany}>{item.nomEntreprise}</Text>
+                <Text style={styles.webJobCardDate}>
+                  Date de l'entretien : {formatDate(item.dateEntretien)}
+                </Text>
+
+                {item.notes ? (
+                  <Text style={styles.interviewNoteText}>{item.notes}</Text>
+                ) : null}
+
+                <TouchableOpacity
+                  style={[styles.webPassTestBtn, { backgroundColor: '#0284C7' }]}
+                  activeOpacity={0.85}
+                  onPress={() => {
+                    Alert.alert(
+                      'Visioconférence Entretien',
+                      `Lien de connexion direct :\n${item.lienVisio || 'https://meet.talentflow.io/interview-789'}`
+                    );
+                  }}
+                >
+                  <MaterialCommunityIcons name="video" size={18} color="#FFFFFF" />
+                  <Text style={styles.webPassTestBtnText}>Rejoindre la visio</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
           </View>
-        </View>
+        )}
 
-        {/* Menu Navigation Candidat */}
-        <View style={styles.menuCard}>
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => navigation.navigate('MyApplications')}
-          >
-            <View style={[styles.menuIcon, { backgroundColor: '#E8F0FE' }]}>
-              <MaterialCommunityIcons name="file-document-outline" size={20} color={COLORS.primary} />
-            </View>
-            <Text style={styles.menuText}>Mes Candidatures</Text>
-            <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.textMuted} />
-          </TouchableOpacity>
+        {/* CONTENU ONGLET 3 : FAVORIS */}
+        {activeTab === 'favoris' && (
+          <View style={styles.tabContentList}>
+            {candidateFavorites.map((job, idx) => (
+              <JobCard
+                key={job.id ? `fav-${job.id}` : `fav-${idx}`}
+                job={job}
+                isFavorite={true}
+                onPress={() => navigation.navigate('JobDetail', { jobId: job.id })}
+                onApply={() => navigation.navigate('ApplyModal', { job })}
+              />
+            ))}
+          </View>
+        )}
 
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => navigation.navigate('Interviews')}
-          >
-            <View style={[styles.menuIcon, { backgroundColor: '#E0F2FE' }]}>
-              <MaterialCommunityIcons name="calendar-clock" size={20} color="#0284C7" />
-            </View>
-            <Text style={styles.menuText}>Mes Entretiens Planifiés</Text>
-            <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.textMuted} />
-          </TouchableOpacity>
+        {/* CONTENU ONGLET 4 : TESTS TECHNIQUES & SCORES */}
+        {activeTab === 'tests' && (
+          <View style={styles.tabContentList}>
+            {candidateTests.map((t, idx) => (
+              <View key={t.id ? `t-${t.id}` : `t-${idx}`} style={styles.webJobCard}>
+                <View style={styles.webJobCardHeader}>
+                  <Text style={styles.webJobCardTitle} numberOfLines={2}>
+                    {t.titre}
+                  </Text>
+                  <View
+                    style={[
+                      styles.webStatusPill,
+                      t.reussi ? styles.webStatusPillAccepted : styles.webStatusPillRefused,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.webStatusPillText,
+                        t.reussi ? styles.webStatusPillTextAccepted : styles.webStatusPillTextRefused,
+                      ]}
+                    >
+                      {t.score}%
+                    </Text>
+                  </View>
+                </View>
 
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => navigation.navigate('TakeTest', { testId: 1, jobId: 1 })}
-          >
-            <View style={[styles.menuIcon, { backgroundColor: '#EDE9FE' }]}>
-              <MaterialCommunityIcons name="certificate-outline" size={20} color="#7C3AED" />
-            </View>
-            <Text style={styles.menuText}>Tests Techniques QCM</Text>
-            <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.textMuted} />
-          </TouchableOpacity>
+                <Text style={styles.webJobCardCompany}>{t.nomEntreprise}</Text>
+                <Text style={styles.webJobCardDate}>Validé le {formatDate(t.datePassage)}</Text>
 
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => navigation.navigate('CandidateProfile')}
-          >
-            <View style={[styles.menuIcon, { backgroundColor: '#FEF3C7' }]}>
-              <MaterialCommunityIcons name="account-edit-outline" size={20} color="#D97706" />
-            </View>
-            <Text style={styles.menuText}>Mon Profil & CV</Text>
-            <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.textMuted} />
-          </TouchableOpacity>
-        </View>
+                <TouchableOpacity
+                  style={[styles.webPassTestBtn, { backgroundColor: '#4F46E5' }]}
+                  activeOpacity={0.85}
+                  onPress={() =>
+                    navigation.navigate('TakeTest', {
+                      jobId: 1,
+                      testId: t.id || 1,
+                    })
+                  }
+                >
+                  <MaterialCommunityIcons name="reload" size={17} color="#FFFFFF" />
+                  <Text style={styles.webPassTestBtnText}>Repasser l'évaluation</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        )}
 
-        {/* Déconnexion */}
-        <TouchableOpacity style={styles.logoutBtn} onPress={logout}>
-          <MaterialCommunityIcons name="logout" size={20} color="#DC2626" />
-          <Text style={styles.logoutText}>Se déconnecter</Text>
+        {/* Accès direct Profil & CV */}
+        <TouchableOpacity
+          style={styles.profileEditRow}
+          onPress={() => navigation.navigate('CandidateProfile')}
+        >
+          <MaterialCommunityIcons name="account-edit-outline" size={20} color={COLORS.primary} />
+          <Text style={styles.profileEditText}>Modifier mon profil complet & compétences</Text>
+          <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.textMuted} />
         </TouchableOpacity>
       </ScrollView>
     );
@@ -697,6 +932,213 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: '#DC2626',
+  },
+  // Nouveaux styles Espace CANDIDAT (Miroir exact du web)
+  candidateTopRow: {
+    marginBottom: 10,
+    marginTop: 4,
+  },
+  candidatePageTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: COLORS.secondary,
+    letterSpacing: -0.2,
+  },
+  candidateProfileHeaderCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    marginBottom: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  candidateAvatarCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#DBEAFE',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  candidateAvatarText: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#1967D2',
+  },
+  candidateInfoCol: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  candidateFullName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.secondary,
+  },
+  candidateTitreRole: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#1967D2',
+    marginTop: 1,
+  },
+  candidateEmailText: {
+    fontSize: 12,
+    color: COLORS.textMuted,
+    marginTop: 1,
+  },
+  candidateLogoutIconBtn: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: '#FEF2F2',
+  },
+  candidateTabsBar: {
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    paddingVertical: 4,
+    marginBottom: 14,
+  },
+  candidateTabItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    position: 'relative',
+  },
+  candidateTabActive: {},
+  candidateTabText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: COLORS.textMuted,
+    marginTop: 3,
+  },
+  candidateTabTextActive: {
+    color: COLORS.primary,
+    fontWeight: '700',
+  },
+  candidateTabIndicator: {
+    position: 'absolute',
+    bottom: -4,
+    left: '20%',
+    right: '20%',
+    height: 3,
+    backgroundColor: COLORS.primary,
+    borderRadius: 2,
+  },
+  tabContentList: {
+    marginBottom: 14,
+  },
+  webJobCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+  webJobCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 4,
+  },
+  webJobCardTitle: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.secondary,
+    marginRight: 8,
+  },
+  webStatusPill: {
+    backgroundColor: '#FEF3C7',
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 12,
+  },
+  webStatusPillAccepted: {
+    backgroundColor: '#DCFCE7',
+  },
+  webStatusPillInterview: {
+    backgroundColor: '#EDE9FE',
+  },
+  webStatusPillRefused: {
+    backgroundColor: '#FEE2E2',
+  },
+  webStatusPillText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#D97706',
+  },
+  webStatusPillTextAccepted: {
+    color: '#16A34A',
+  },
+  webStatusPillTextInterview: {
+    color: '#7C3AED',
+  },
+  webStatusPillTextRefused: {
+    color: '#DC2626',
+  },
+  webJobCardCompany: {
+    fontSize: 13,
+    color: COLORS.textMuted,
+    marginTop: 2,
+  },
+  webJobCardDate: {
+    fontSize: 12,
+    color: '#94A3B8',
+    marginTop: 2,
+    marginBottom: 14,
+  },
+  webPassTestBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1967D2',
+    height: 44,
+    borderRadius: 10,
+    gap: 8,
+  },
+  webPassTestBtnText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  interviewNoteText: {
+    fontSize: 12,
+    color: COLORS.textMuted,
+    fontStyle: 'italic',
+    marginBottom: 12,
+  },
+  profileEditRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    padding: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    marginTop: 4,
+    marginBottom: 16,
+  },
+  profileEditText: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '600',
+    color: COLORS.primary,
+    marginLeft: 10,
   },
 });
 
