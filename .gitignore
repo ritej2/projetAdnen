@@ -1,0 +1,42 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Java Spring Boot
+**/target/
+**/.mvn/
+**/uploads/cv/*
+**/uploads/logos/*
+**/uploads/photos/*
+!**/uploads/cv/.gitkeep
+!**/uploads/logos/.gitkeep
+!**/uploads/photos/.gitkeep
+
+# Mobile / Expo / Android
+**/.expo/
+**/mobile/node_modules/
+**/android/.gradle/
+**/android/app/build/
+**/android/.idea/
+**/android/*.iml
+**/android/local.properties
+**/android/build/
+*.jks
+*.keystore
+
+# Flutter (if present)
+**/.dart_tool/
+**/build/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+*.swp
+.DS_Store
+Thumbs.db

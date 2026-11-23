@@ -1,0 +1,435 @@
+/* ============================================================================
+   JOBFLOW / SUPERIO — PREMIUM 3D SAAS DESIGN SYSTEM, GLASSMORPHISM & DARK MODE
+   ============================================================================ */
+
+:root {
+  --jf-primary: #2563eb;
+  --jf-primary-glow: rgba(37, 99, 235, 0.35);
+  --jf-accent: #6366f1;
+  --jf-cyan: #06b6d4;
+  --jf-emerald: #10b981;
+  --jf-bg-page: #f8fafc;
+  --jf-card-bg: rgba(255, 255, 255, 0.88);
+  --jf-card-border: rgba(226, 232, 240, 0.9);
+  --jf-text-main: #0f172a;
+  --jf-text-muted: #475569;
+  --jf-shadow-3d: 0 20px 45px -15px rgba(15, 23, 42, 0.09), 0 4px 16px -4px rgba(37, 99, 235, 0.06);
+  --jf-shadow-hover: 0 28px 60px -12px rgba(37, 99, 235, 0.18), 0 8px 24px -6px rgba(99, 102, 241, 0.12);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Jost', sans-serif !important;
+  color: var(--jf-text-main);
+  background-color: var(--jf-bg-page);
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+}
+
+/* ============================================================================
+   ARABIC (RTL) SUPPORT
+   ============================================================================ */
+html[dir='rtl'] body,
+body.jf-rtl {
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif !important;
+  direction: rtl;
+  text-align: right;
+}
+
+html[dir='rtl'] .main-header .main-box .nav-outer {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+html[dir='rtl'] .navigation > li {
+  float: right;
+}
+
+html[dir='rtl'] .job-search-form .form-group .icon {
+  right: 25px;
+  left: auto;
+}
+
+html[dir='rtl'] .job-search-form .form-group input {
+  padding-right: 55px;
+  padding-left: 20px;
+  text-align: right;
+}
+
+html[dir='rtl'] .popular-searches {
+  text-align: right;
+}
+
+html[dir='rtl'] .company-logo {
+  float: right;
+  margin-left: 20px;
+  margin-right: 0;
+}
+
+html[dir='rtl'] .sec-title.text-center {
+  text-align: center;
+}
+
+html[dir='rtl'] .sec-title:not(.text-center) {
+  text-align: right;
+}
+
+/* Dark Mode Theme Support */
+body.jf-dark-mode {
+  --jf-bg-page: #090d16;
+  --jf-card-bg: rgba(17, 24, 39, 0.82);
+  --jf-card-border: rgba(51, 65, 85, 0.65);
+  --jf-text-main: #f8fafc;
+  --jf-text-muted: #94a3b8;
+  background-color: #090d16 !important;
+  color: #f8fafc !important;
+}
+
+body.jf-dark-mode .page-wrapper,
+body.jf-dark-mode .page-wrapper.dashboard,
+body.jf-dark-mode .ls-section,
+body.jf-dark-mode .job-section,
+body.jf-dark-mode .job-categories,
+body.jf-dark-mode .about-section,
+body.jf-dark-mode .work-section,
+body.jf-dark-mode .top-companies,
+body.jf-dark-mode .job-detail-section,
+body.jf-dark-mode .job-detail-outer {
+  background-color: #090d16 !important;
+  color: #f8fafc !important;
+}
+
+body.jf-dark-mode .main-header.fixed-header,
+body.jf-dark-mode .user-sidebar {
+  background: rgba(15, 23, 42, 0.88) !important;
+  backdrop-filter: blur(18px);
+  border-color: rgba(51, 65, 85, 0.6) !important;
+}
+
+body.jf-dark-mode .ls-widget,
+body.jf-dark-mode .job-block .inner-box,
+body.jf-dark-mode .category-block .inner-box,
+body.jf-dark-mode .work-block .inner-box,
+body.jf-dark-mode .company-block .inner-box,
+body.jf-dark-mode .company-block-three .inner-box,
+body.jf-dark-mode .candidate-block-three .inner-box,
+body.jf-dark-mode .filters-outer,
+body.jf-dark-mode .sidebar-widget,
+body.jf-dark-mode .login-form,
+body.jf-dark-mode .ui-block .ui-item,
+body.jf-dark-mode .superio-modal-card {
+  background: rgba(17, 24, 39, 0.86) !important;
+  border-color: rgba(51, 65, 85, 0.7) !important;
+  color: #f1f5f9 !important;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45) !important;
+}
+
+body.jf-dark-mode h1,
+body.jf-dark-mode h2,
+body.jf-dark-mode h3,
+body.jf-dark-mode h4,
+body.jf-dark-mode h5,
+body.jf-dark-mode h6,
+body.jf-dark-mode .navigation > li > a,
+body.jf-dark-mode .job-block h4 a,
+body.jf-dark-mode .sec-title h2 {
+  color: #f8fafc !important;
+}
+
+body.jf-dark-mode p,
+body.jf-dark-mode .text,
+body.jf-dark-mode .job-info li,
+body.jf-dark-mode label {
+  color: #94a3b8 !important;
+}
+
+body.jf-dark-mode input,
+body.jf-dark-mode select,
+body.jf-dark-mode textarea {
+  background-color: rgba(30, 41, 59, 0.9) !important;
+  border-color: rgba(71, 85, 105, 0.7) !important;
+  color: #f8fafc !important;
+}
+
+body.jf-dark-mode .default-table thead th {
+  background: rgba(30, 41, 59, 0.95) !important;
+  color: #cbd5e1 !important;
+  border-color: rgba(51, 65, 85, 0.7) !important;
+}
+
+body.jf-dark-mode .default-table tbody td {
+  border-color: rgba(51, 65, 85, 0.45) !important;
+  color: #e2e8f0 !important;
+}
+
+/* Dashboard Wrapper & Glass Header */
+.page-wrapper.dashboard {
+  padding-top: 85px;
+  background: radial-gradient(circle at 10% 10%, rgba(37, 99, 235, 0.05), transparent 40%),
+              radial-gradient(circle at 90% 80%, rgba(99, 102, 241, 0.06), transparent 40%),
+              #f4f7fe;
+  min-height: 100vh;
+}
+
+.main-header.fixed-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 999;
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.06);
+  transition: all 0.3s ease;
+}
+
+.user-sidebar {
+  top: 85px !important;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  border-right: 1px solid rgba(226, 232, 240, 0.85);
+}
+
+/* 3D Perspective & Hover Elevation on Cards */
+.job-block .inner-box {
+  border-radius: 16px !important;
+  border: 1px solid var(--jf-card-border) !important;
+  background: var(--jf-card-bg);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--jf-shadow-3d);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.3s ease !important;
+  transform-style: preserve-3d;
+  position: relative;
+  overflow: hidden;
+}
+
+.job-block .inner-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #2563eb, #6366f1, #06b6d4);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.job-block .inner-box:hover {
+  box-shadow: var(--jf-shadow-hover) !important;
+  border-color: rgba(37, 99, 235, 0.45) !important;
+  transform: perspective(1000px) translateY(-6px) rotateX(1.5deg) rotateY(-1deg);
+}
+
+.job-block .inner-box:hover::before {
+  opacity: 1;
+}
+
+.category-block .inner-box {
+  border-radius: 16px !important;
+  border: 1px solid var(--jf-card-border) !important;
+  background: var(--jf-card-bg);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--jf-shadow-3d);
+  transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1) !important;
+  transform-style: preserve-3d;
+}
+
+.category-block .inner-box:hover {
+  transform: perspective(900px) translateY(-7px) rotateX(2deg) scale(1.015);
+  box-shadow: var(--jf-shadow-hover) !important;
+  border-color: #2563eb !important;
+}
+
+/* Dashboard Widgets & KPI 3D Cards */
+.ls-widget {
+  border-radius: 18px !important;
+  border: 1px solid rgba(226, 232, 240, 0.85) !important;
+  box-shadow: var(--jf-shadow-3d) !important;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(14px);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.ui-block .ui-item {
+  border-radius: 16px !important;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: var(--jf-shadow-3d) !important;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.ui-block .ui-item:hover {
+  transform: perspective(800px) translateY(-5px) rotateX(2deg);
+  box-shadow: var(--jf-shadow-hover) !important;
+}
+
+/* Floating 3D Hero Badges */
+@keyframes jfFloatSlow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(1deg); }
+}
+
+@keyframes jfPulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.35); }
+  50% { box-shadow: 0 0 25px 6px rgba(99, 102, 241, 0.25); }
+}
+
+.banner-section {
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.14), transparent 45%),
+              radial-gradient(circle at 15% 75%, rgba(6, 182, 212, 0.12), transparent 45%),
+              linear-gradient(135deg, #eff6ff 0%, #f8fafc 55%, #eef2ff 100%) !important;
+}
+
+body.jf-dark-mode .banner-section {
+  background: radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.22), transparent 48%),
+              radial-gradient(circle at 15% 75%, rgba(6, 182, 212, 0.18), transparent 48%),
+              linear-gradient(135deg, #090d16 0%, #0f172a 55%, #111827 100%) !important;
+}
+
+.banner-section .info_block,
+.banner-section .info_block_three,
+.banner-section .info_block_four {
+  backdrop-filter: blur(14px);
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12) !important;
+  border-radius: 14px !important;
+  animation: jfFloatSlow 5s ease-in-out infinite;
+}
+
+body.jf-dark-mode .banner-section .info_block,
+body.jf-dark-mode .banner-section .info_block_three,
+body.jf-dark-mode .banner-section .info_block_four {
+  background: rgba(30, 41, 59, 0.9) !important;
+  border-color: rgba(99, 102, 241, 0.4);
+  color: #f8fafc !important;
+}
+
+.banner-section .info_block_three {
+  animation-delay: 1.2s;
+}
+
+.banner-section .info_block_four {
+  animation-delay: 2.4s;
+}
+
+/* Search Bar Glassmorphism */
+.job-search-form {
+  border-radius: 16px !important;
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  box-shadow: 0 24px 50px -12px rgba(37, 99, 235, 0.15) !important;
+  backdrop-filter: blur(16px);
+}
+
+/* Modern Gradient Buttons */
+.theme-btn.btn-style-one {
+  background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%) !important;
+  box-shadow: 0 8px 20px -4px rgba(37, 99, 235, 0.4);
+  border-radius: 10px !important;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, filter 0.22s ease !important;
+}
+
+.theme-btn.btn-style-one:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px -4px rgba(79, 70, 229, 0.55);
+  filter: brightness(1.06);
+}
+
+.theme-btn.btn-style-three {
+  border-radius: 10px !important;
+  transition: all 0.22s ease !important;
+}
+
+/* Ensure flaticon classes gracefully render via Line Awesome if referenced */
+[class*="flaticon-"] {
+  font-family: 'Line Awesome Free' !important;
+  font-weight: 900;
+  font-style: normal;
+}
+.flaticon-briefcase::before { content: "\f0b1"; }
+.flaticon-map-locator::before { content: "\f3c5"; }
+.flaticon-clock-3::before { content: "\f017"; }
+.flaticon-money::before { content: "\f153"; }
+.flaticon-mail::before { content: "\f0e0"; }
+.flaticon-user::before { content: "\f007"; }
+.flaticon-bookmark::before { content: "\f02e"; }
+
+/* Clean modal backdrop & animations */
+.superio-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(15, 23, 42, 0.68);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+  animation: jfFadeIn 0.2s ease-out;
+}
+
+.superio-modal-card {
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  max-width: 720px;
+  width: 100%;
+  margin: auto;
+  padding: 32px;
+  box-shadow: 0 25px 70px rgba(15, 23, 42, 0.28);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@keyframes jfFadeIn {
+  from { opacity: 0; transform: scale(0.97) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Page Entrance Animation */
+.jf-page-enter {
+  animation: jfFadeIn 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Live MySQL & 3D Status Pill */
+.jf-live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(99, 102, 241, 0.14));
+  color: #2563eb;
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  margin-bottom: 14px;
+}
+
+body.jf-dark-mode .jf-live-pill {
+  background: rgba(37, 99, 235, 0.22);
+  color: #60a5fa;
+  border-color: rgba(96, 165, 250, 0.35);
+}
+
+.jf-live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+}

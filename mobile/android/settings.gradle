@@ -1,0 +1,27 @@
+pluginManagement {
+    includeBuild("../node_modules/@react-native/gradle-plugin")
+}
+
+plugins {
+    id("com.facebook.react.settings")
+}
+
+extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
+    ex.autolinkLibrariesFromCommand()
+}
+
+rootProject.name = 'JobFlow'
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        reactAndroidLibs {
+            from(files("../node_modules/react-native/gradle/libs.versions.toml"))
+        }
+    }
+}
+
+apply from: new File("../node_modules/expo/scripts/autolinking.gradle");
+useExpoModules()
+
+include ':app'
+includeBuild("../node_modules/@react-native/gradle-plugin")
